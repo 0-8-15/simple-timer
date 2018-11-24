@@ -8,9 +8,15 @@
  ;; the TASK to communicate that a task is still active and may be
  ;; successfully removed.  If this was interrupted between reading the
  ;; cdr's value and writing over it, the user side might continue
- ;; believing the timer was canceld and still seeing it invoked.  The
- ;; spots are documented in the source.  Otherwise it's pointless
- ;; here:
+ ;; believing the timer was canceled and still seeing it invoked.  The
+ ;; spots are documented in the source.
+ ;;
+ ;; Instead of relying on disabled interrupts (which in itself might
+ ;; be a dangerous assumption if we'd take posix signals into
+ ;; account), we should better use low level code to ensure this
+ ;; assumptions holds than enabling interrupts.
+ ;;
+ ;; Otherwise it's pointless here:
  (disable-interrupts)
 
  (no-bound-checks)
