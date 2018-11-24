@@ -38,7 +38,13 @@ it's scheduled time every {{timer-period}}.
 
 == Requirements
 
-Requires [[pigeon-hole]], [[llrb-tree]].
+Requires [[llrb-tree]], [[pigeon-hole]].
+
+Notes:
+
+* Could use any other priority queue conforming to the srfi-69 API
+  instead of llrb-tree
+* pigeon-hole is merely for historical reasons
 
 == API
 
