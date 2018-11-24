@@ -87,7 +87,7 @@
     (else ex))
    (register-timer-task! 0.01 (current-thread))
    (thread-sleep! 0.03)
-   'timer-exceptions-should-have-occured-before))
+   'timer-exceptions-should-have-occurred-before))
 
  (test
   "timers invoked"

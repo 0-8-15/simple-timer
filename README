@@ -12,13 +12,20 @@ TBD: Support [[https://srfi.schemers.org/srfi-120/srfi-120.html|srfi-120]] too.
 The srfi-120 API incurs just too much overhead for many use cases to
 settle upon.  (The issue: srfi120's task identifiers as returned by
 {{timer-schedule!}} are defined to be readable object, which adds
-undue overhead for cancelation.)
+undue overhead for cancellation.)
 
 Every other egg implements it's own idea of timers, which makes for a
 hell to mix them.  This should be(come) a low level enough interface
 to support most needs while having all timers in one place.
 
-These timers are assumed mostly timeouts or regular background jobs
+Another issue frequently coming up with CHICKEN is the false deadlock
+detection when signal handlers are used to unlock the situation.  The
+common work around to load yet another thread looping for some time
+puts load at the core's timeout queue.  Simply using this egg should
+install one such timer once and for all.  (TBD: make sure this works
+over forks too.  Should this cancel timeouts?)
+
+The timers here are assumed mostly timeouts or regular background jobs
 and hence rarely run.  They should not be sensitive to precise
 timings.  (It is the job of this eggs timers to reduce the load on the
 timeout queue in chickens core and optimize for minimal overhead for
@@ -88,7 +95,7 @@ Returns {{#f}} if the {{TASK}} was already canceled or fired.
   (else ex))
  (register-timer-task! 1 (current-thread))
  (thread-sleep! 3)
- 'timer-exceptions-should-have-occured-before)
+ 'timer-exceptions-should-have-occurred-before)
 => #t
 </enscript>
 
