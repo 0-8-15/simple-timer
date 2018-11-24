@@ -1,0 +1,163 @@
+[[tags: egg]]
+== simple-timer
+
+Simple, cancel-able, efficient timers.
+
+Currently only a low level interface is provided.
+
+TBD: Support [[https://srfi.schemers.org/srfi-120/srfi-120.html|srfi-120]] too.
+
+== Rationale
+
+The srfi-120 API incurs just too much overhead for many use cases to
+settle upon.  (The issue: srfi120's task identifiers as returned by
+{{timer-schedule!}} are defined to be readable object, which adds
+undue overhead for cancelation.)
+
+Every other egg implements it's own idea of timers, which makes for a
+hell to mix them.  This should be(come) a low level enough interface
+to support most needs while having all timers in one place.
+
+These timers are assumed mostly timeouts or regular background jobs
+and hence rarely run.  They should not be sensitive to precise
+timings.  (It is the job of this eggs timers to reduce the load on the
+timeout queue in chickens core and optimize for minimal overhead for
+timers canceled within less than a {{timer-period}}.)
+
+Timeouts fire only if they are not canceled before at least a full
+{{timer-period}} passed.  A {{timer-period}} defaults to one
+second.  Timers are run in batches rounded to {{timer-epsilon}} of
+it's scheduled time every {{timer-period}}.
+
+== Requirements
+
+Requires [[pigeon-hole]], [[llrb-tree]].
+
+== API
+
+<procedure>(timer-period . new) -> PERIOD</procedure>
+
+Without argument queries the current period.  With argument chances
+the period at which timers are fired.
+
+<procedure>(timer-epsilon . new) -> PERIOD</procedure>
+
+Without argument queries the current epsilon.  With argument chances
+the epsilon for grouping timers by due time.
+
+<procedure>(timer-condition? obj) -> boolean</procedure>
+
+Predicate to test for timer conditions.
+
+<procedure>(make-timer-condition)</procedure>
+
+Creates a timer condition.
+
+<procedure>(register-timer-task! time job) -> TASK</procedure>
+
+Registers {{JOB}} to be run at {{TIME}}.  Returns a reference to the
+task.  The reference is opaque by definition - unlike srfi-120
+{{timer-schedule!}}'s task identifiers.  In fact it is a pair.
+
+The job is typically a thunk to be executed.  This thunk MUST NOT
+raise exceptions, MAY NOT block and SHOULD return ASAP.  So except for
+simple, fast operations it should schedule the actual operation,
+e.g. by starting a fresh thread, and return.
+
+If a thread is given as {{JOB}}, it will receive a {{timer-condition?}}
+via {{thread-signal!}}.
+
+Undocumented: if a {{pigeon-hole}} is given as {{JOB}} a
+{{timer-condition?}} is unconditionally queued.
+
+<procedure>(cancel-timer-task! TASK) -> boolean</procedure>
+
+Cancels the TASK (must be a reference obtained from
+{{register-timer-task!}}).  (In fact it sets the cdr the reference to
+{{#f}}).
+
+Returns {{#f}} if the {{TASK}} was already canceled or fired.
+
+== Examples
+
+<enscript highlight="scheme">
+(handle-exceptions
+ ex
+ (cond
+  ((timer-condition? ex) #t)
+  (else ex))
+ (register-timer-task! 1 (current-thread))
+ (thread-sleep! 3)
+ 'timer-exceptions-should-have-occured-before)
+=> #t
+</enscript>
+
+Cancelation: {{set! b #t}} is never invoked.
+<enscript highlight="scheme">
+(or (cancel-timer-task!
+      (register-timer-task! 0.03 (lambda () (set! b #t))))
+    (error "too late to cancel timer"))
+</enscript>
+
+Best practice using thread signals:
+<enscript highlight="scheme">
+(handle-exceptions
+ ex
+ (cond
+  ((timer-condition? ex)
+  ;; clean up after timeout here
+  #t)
+  (else ex))
+ ...
+ (let* ((task (register-timer-task! 1 (current-thread)) )
+        (result (do-some-work-within-time-limit)))
+   (cancel-timer-task! task)
+   ...
+   result)
+</enscript>
+
+Best practice using messages (try to avoid needless {{dynamic-wind}}s
+in this context):
+
+<enscript highlight="scheme">
+ (let* ((chan (gochan 0))
+        (task (register-timer-task! 1 (lambda () (go (gochan-send chan (make-timer-condition))))) )
+        (result (do-some-work-with chan)))
+   (cancel-timer-task! task)
+   result)
+</enscript>
+
+== About this egg
+
+=== Source
+
+Latest version:
+[[http://github.com/0-8-15/simple-timer]]
+
+=== Version History
+
+0.1: Initial version.
+
+=== Authors
+
+Jörg F. Wittenberger
+
+=== License
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the Software),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED ASIS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

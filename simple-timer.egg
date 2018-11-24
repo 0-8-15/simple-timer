@@ -1,0 +1,21 @@
+;; -*- mode: Scheme; -*-
+((category hell)
+ (license "BSD")
+ (author "Jörg F. Wittenberger")
+ (version "0.1")
+ (synopsis "Simple, cancel-able, efficient timer API")
+ (dependencies
+  srfi-18
+  pigeon-hole
+  llrb-tree)
+ (test-dependencies test matchable)
+ (distribution-files
+  "README"
+  "simple-timer.egg" "simple-timer.meta" "simple-timer.setup"
+  "simple-timer.scm" "timeout.scm"
+  "tests/run.scm")
+ (components
+  (extension
+   simple-timer
+   (types-file)
+   (csc-options -O4 -lfa2 -d2 -clustering -no-trace -no-lambda-info))))

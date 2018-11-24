@@ -1,0 +1,12 @@
+;; -*-Scheme-*-
+
+(define opt-flags '(-O4 -lfa2 -d2 -no-trace -no-lambda-info))
+
+(compile -s ,@opt-flags -J -emit-type-file "simple-timer.types" "simple-timer.scm")
+(compile -c ,@opt-flags "simple-timer.scm" -unit simple-timer)
+(compile -s -O2 -d0 "simple-timer.import.scm")
+
+(install-extension
+ 'simple-timer
+ '("simple-timer.types" "simple-timer.so" "simple-timer.import.so")
+ '((version "0.1")))

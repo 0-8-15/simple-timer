@@ -1,0 +1,9 @@
+;; -*- mode: Scheme; -*-
+((category hell)
+ (license "BSD")
+ (author "Jörg F. Wittenberger")
+ (synopsis "Simple, cancel-able, efficient timer API")
+ (doc-from-wiki)
+ (needs (pigeon-hole "0.2.2") llrb-tree)
+ (files "README" "simple-timer.meta" "simple-timer.setup" "simple-timer.scm" "timeout.scm"
+	"tests/run.scm"))
