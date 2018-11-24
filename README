@@ -80,7 +80,7 @@ Undocumented: if a {{pigeon-hole}} is given as {{JOB}} a
 <procedure>(cancel-timer-task! TASK) -> boolean</procedure>
 
 Cancels the TASK (must be a reference obtained from
-{{register-timer-task!}}).  (In fact it atomically sets the cdr the
+{{register-timer-task!}}).  (In fact it atomically sets the cdr of the
 reference to {{#f}} and returns the old value.)
 
 Returns {{#f}} if the {{TASK}} was already canceled or fired.
