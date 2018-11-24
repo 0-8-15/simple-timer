@@ -68,9 +68,10 @@ Creates a timer condition.
 
 <procedure>(register-timer-task! time job) -> TASK</procedure>
 
-Registers {{JOB}} to be run at {{TIME}}.  Returns a reference to the
-task.  The reference is opaque by definition - unlike srfi-120
-{{timer-schedule!}}'s task identifiers.  In fact it is a pair.
+Registers {{JOB}} to be run after {{TIME}} has passed.  Returns a
+reference to the task.  The reference is opaque by definition - unlike
+srfi-120 {{timer-schedule!}}'s task identifiers.  In fact it is a
+pair.
 
 The job is typically a thunk to be executed.  This thunk MUST NOT
 raise exceptions, MAY NOT block and SHOULD return ASAP.  So except for
