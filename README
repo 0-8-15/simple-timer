@@ -115,19 +115,23 @@ Cancelation: {{set! b #t}} is never invoked.
 
 Best practice using thread signals:
 <enscript highlight="scheme">
-(handle-exceptions
- ex
- (cond
-  ((timer-condition? ex)
-  ;; clean up after timeout here
-  #t)
-  (else ex))
- ...
- (let* ((task (register-timer-task! 1 (current-thread)) )
-        (result (do-some-work-within-time-limit)))
-   (cancel-timer-task! task)
+(let ((task #f))
+  (handle-exceptions
+   ex
+   (cond
+    ((timer-condition? ex)
+     ;; clean up after timeout here
+     #t)
+    (else
+     (or (cancel-timer-task! task)
+	 (error "too late to cancel, that's bad"))
+     ex))
    ...
-   result)
+   (set! task (register-timer-task! 1 (current-thread)))
+   (let ((result (do-some-work-within-time-limit)))
+     (cancel-timer-task! task)
+     ...
+     result)))
 </enscript>
 
 Best practice using messages (try to avoid needless {{dynamic-wind}}s
