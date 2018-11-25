@@ -9,4 +9,4 @@
 (install-extension
  'simple-timer
  '("simple-timer.types" "simple-timer.so" "simple-timer.import.so")
- '((version "0.1")))
+ '((version "0.1.1")))

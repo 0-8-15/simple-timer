@@ -2,7 +2,7 @@
 ((category hell)
  (license "BSD")
  (author "Jörg F. Wittenberger")
- (version "0.1")
+ (version "0.1.1")
  (synopsis "Simple, cancel-able, efficient timer API")
  (dependencies
   srfi-18
