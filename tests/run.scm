@@ -11,16 +11,18 @@
  (cond-expand
   (chicken-4
    (import (except chicken promise?) srfi-18 ports extras)
-   (import (only data-structures identity)))
+   (import (only data-structures identity))
+   (use matchable)
+   (use test))
   (else
    (import
     (chicken base)
     (chicken port)
     (chicken condition)
     srfi-18 srfi-28
-    matchable)))
+    matchable
+    test)))
  (import simple-timer)
- (import test)
 
 (define (dbg l v) (format (current-error-port) "D ~a ~s\n" l v) v)
 
