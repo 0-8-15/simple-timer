@@ -99,7 +99,7 @@
      (got done) (single-shot)
      (register-timer-task! 0.03 (lambda () (set! a #t)))
      (register-timer-task! 0.03 (lambda () (set! b #t)))
-     (register-timer-task! 0.04 (lambda () (done list a b)))
+     (register-timer-task! 0.05 (lambda () (done list a b)))
      ((got)))))
 
   (test
